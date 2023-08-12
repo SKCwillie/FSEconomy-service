@@ -26,7 +26,3 @@ class Aircraft(models.Model):
     EnginePrice = models.FloatField()
     ModelId = models.IntegerField(primary_key=True)
     MaxCargo = models.IntegerField()
-
-
-if __name__ == '__main__':
-    pass
