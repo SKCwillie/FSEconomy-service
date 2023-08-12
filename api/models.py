@@ -27,4 +27,6 @@ class Aircraft(models.Model):
     ModelId = models.IntegerField(primary_key=True)
     MaxCargo = models.IntegerField()
 
-#this is a comment
+
+if __name__ == '__main__':
+    pass
