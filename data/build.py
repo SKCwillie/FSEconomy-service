@@ -14,4 +14,5 @@ def create_dbs():
     pass
 
 
-create_dbs()
+if __name__ == '__main__':
+    create_dbs()
