@@ -26,3 +26,15 @@ class Aircraft(models.Model):
     EnginePrice = models.FloatField()
     ModelId = models.IntegerField(primary_key=True)
     MaxCargo = models.IntegerField()
+
+
+class Airport(models.Model):
+    icao = models.CharField(max_length=4, primary_key=True)
+    lat = models.FloatField()
+    lon = models.FloatField()
+    type = models.CharField(max_length=200)
+    size = models.IntegerField()
+    name = models.CharField(max_length=200)
+    city = models.CharField(max_length=200)
+    state = models.CharField(max_length=200)
+    country = models.CharField(max_length=200)

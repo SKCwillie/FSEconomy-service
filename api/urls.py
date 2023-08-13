@@ -20,5 +20,8 @@ from api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('aircrafts/', views.aircraft_list)
+    path('aircraft/', views.aircraft_list),
+    path('aircraft/<int:model_id>/', views.get_aircraft),
+    path('airport/', views.airport_list),
+    path('airport/<str:icao>', views.get_airport),
 ]

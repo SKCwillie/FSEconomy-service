@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Aircraft
+from .models import Aircraft, Airport
 
 
 class AircraftSerializer(serializers.ModelSerializer):
@@ -24,6 +24,8 @@ class AircraftSerializer(serializers.ModelSerializer):
         Fuel['RAux'] = instance.RAux
         Fuel['RTip'] = instance.RTip
         Fuel['RExt2'] = instance.RExt2
+        Fuel[
+            'Total'] = instance.Ext1 + instance.LTip + instance.LAux + instance.LMain + instance.Center1 + instance.Center2 + instance.Center3 + instance.RMain + instance.RAux + instance.RTip + instance.RExt2
         Weight = dict()
         Weight['Max'] = instance.MTOW
         Weight['Empty'] = instance.EmptyWeight
@@ -41,3 +43,9 @@ class AircraftSerializer(serializers.ModelSerializer):
         }
 
         return representation
+
+
+class AirportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Airport
+        fields = ['icao', 'lat', 'lon', 'type', 'size', 'name', 'city', 'state', 'country']
