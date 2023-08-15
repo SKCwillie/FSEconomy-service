@@ -24,4 +24,5 @@ urlpatterns = [
     path('aircraft/<int:model_id>/', views.get_aircraft),
     path('airport/', views.airport_list),
     path('airport/<str:icao>', views.get_airport),
+    path('assignment/<str:icao>', views.get_assignments_by_airport)
 ]

@@ -1,6 +1,6 @@
 from django.http import JsonResponse
-from .models import *
 from .serializers import *
+from .scripts import *
 
 
 def aircraft_list(request):
@@ -28,5 +28,6 @@ def get_airport(request, icao):
 
 
 def get_assignments_by_airport(request, icao):
-    query_set = Assignment.objects.all()
-    serializer = AssignmentSerializer(query_set, many=True)
+    user_key = request.headers['userkey']
+    query_set = get_assignments(user_key, icao.upper())
+    return JsonResponse(query_set, safe=False)
