@@ -1,5 +1,4 @@
 from django.db import models
-from rest_pandas import PandasView
 
 
 class Aircraft(models.Model):
@@ -41,8 +40,8 @@ class Airport(models.Model):
     country = models.CharField(max_length=200)
 
 
-class Assignment(PandasView):
-    id = models.IntegerField(primary_key=True)
+class Assignment(models.Model):
+    index = models.IntegerField(primary_key=True)
     FromIcao = models.CharField(max_length=4)
     ToIcao = models.CharField(max_length=4)
     Amount = models.IntegerField()
@@ -50,4 +49,3 @@ class Assignment(PandasView):
     Type = models.CharField(max_length=25)
     Pay = models.IntegerField()
     Distance = models.IntegerField()
-    PayPerMile = models.IntegerField()

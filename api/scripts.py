@@ -59,5 +59,7 @@ def get_assignments(user_key, icao):
     assignments = df.groupby(['FromIcao', 'ToIcao', 'UnitType', 'Type'], as_index=False).agg(
         {'Amount': 'sum', 'Pay': 'sum'})
     assignments = assignments[['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay']]
-    assignments['Distance (nm)'] = assignments.apply(lambda x: get_distance(x['ToIcao'], x['FromIcao']), axis=1)
-    return json.loads(assignments.to_json(orient='index'))
+    assignments['Distance'] = assignments.apply(lambda x: get_distance(x['ToIcao'], x['FromIcao']), axis=1)
+    assignments.to_sql('api_assignment', con, if_exists='append')
+    pass
+
