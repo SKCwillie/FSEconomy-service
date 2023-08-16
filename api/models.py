@@ -38,3 +38,14 @@ class Airport(models.Model):
     city = models.CharField(max_length=200)
     state = models.CharField(max_length=200)
     country = models.CharField(max_length=200)
+
+
+class Assignment(models.Model):
+    index = models.IntegerField(primary_key=True)
+    FromIcao = models.CharField(max_length=4)
+    ToIcao = models.CharField(max_length=4)
+    Amount = models.IntegerField()
+    UnitType = models.CharField(max_length=25)
+    Type = models.CharField(max_length=25)
+    Pay = models.IntegerField()
+    Distance = models.IntegerField()

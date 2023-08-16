@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Aircraft, Airport
+from .models import Aircraft, Airport, Assignment
 
 
 class AircraftSerializer(serializers.ModelSerializer):
@@ -49,3 +49,21 @@ class AirportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airport
         fields = ['icao', 'lat', 'lon', 'type', 'size', 'name', 'city', 'state', 'country']
+
+
+class AssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assignment
+        fields = ['index', 'FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay', 'Distance']
+
+    def to_representation(self, instance):
+        representation = {
+                'FromIcao': instance.FromIcao,
+                'ToIcao': instance.ToIcao,
+                'Distance': instance.Distance,
+                'Pay': instance.Pay,
+                'Amount': instance.Amount,
+                'UnitType': instance.UnitType,
+                'Type': instance.Type
+            }
+        return representation
