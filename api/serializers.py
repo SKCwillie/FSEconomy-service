@@ -58,12 +58,12 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = {
-                'FromIcao': instance.FromIcao,
-                'ToIcao': instance.ToIcao,
-                'Distance': instance.Distance,
-                'Pay': instance.Pay,
-                'Amount': instance.Amount,
-                'UnitType': instance.UnitType,
-                'Type': instance.Type
-            }
+            'FromIcao': instance.FromIcao,
+            'ToIcao': instance.ToIcao,
+            'Distance': instance.Distance,
+            'Pay': instance.Pay,
+            'Amount': instance.Amount,
+            'UnitType': instance.UnitType,
+            'Type': instance.Type
+        }
         return representation
