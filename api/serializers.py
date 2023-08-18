@@ -58,12 +58,33 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = {
-                'FromIcao': instance.FromIcao,
-                'ToIcao': instance.ToIcao,
-                'Distance': instance.Distance,
-                'Pay': instance.Pay,
-                'Amount': instance.Amount,
-                'UnitType': instance.UnitType,
-                'Type': instance.Type
-            }
+            'FromIcao': instance.FromIcao,
+            'ToIcao': instance.ToIcao,
+            'Distance': instance.Distance,
+            'Pay': instance.Pay,
+            'Amount': instance.Amount,
+            'UnitType': instance.UnitType,
+            'Type': instance.Type
+        }
+        return representation
+
+
+class JobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assignment
+        fields = ['index', 'FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay', 'Distance', 'ReturnAmount',
+                  'ReturnType']
+
+    def to_representation(self, instance):
+        representation = {
+            'FromIcao': instance.FromIcao,
+            'ToIcao': instance.ToIcao,
+            'Distance': instance.Distance,
+            'Pay': instance.Pay,
+            'Amount': instance.Amount,
+            'UnitType': instance.UnitType,
+            'Type': instance.Type,
+            'ReturnAmount': instance.ReturnAmount,
+            'ReturnType': instance.ReturnType
+        }
         return representation

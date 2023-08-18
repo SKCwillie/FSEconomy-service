@@ -3,13 +3,22 @@ import geopy.distance
 import pandas as pd
 import requests
 from io import StringIO
-import json
 import os.path
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 db_path = os.path.join(BASE_DIR, "db.sqlite3")
 con = sql.connect(db_path, check_same_thread=False)
 cur = con.cursor()
+
+
+def get_icao_list():
+    """
+    Function that takes no argument but will query the database for all large US and CAN airports
+    :return: list of icaos
+    """
+    query = "SELECT icao FROM api_airport WHERE (country = 'United States' or country = 'Canada') AND size >=3000"
+    query_results = cur.execute(query).fetchall()
+    return [i[0] for i in query_results]
 
 
 def get_coords(icao):
@@ -63,3 +72,32 @@ def get_assignments(user_key, icao):
     assignments.to_sql('api_assignment', con, if_exists='append')
     pass
 
+
+def stringify_icao_list(icao_list, n=30):
+    """
+    function to take a list and breaks the list into a subset of n strings
+    this allows to hit the endpoint n times as to not error out with too many requests
+    :param icao_list: list of icaos
+    :param n: how many strings to divide the list into. i.e. how many times to hit the endpoint
+    :return: a list of strings formatted to easily hit the datafeed
+    """
+    return_list = []
+    icao_list = [icao_list[i::n] for i in range(n)]
+    for sublist in icao_list:
+        return_list.append('-'.join(sublist))
+    return return_list
+
+
+def get_return_pax(FromIcao, ToIcao):
+    """
+    Goes and hits the api_assignments db to find how many return pax exist for given assignment
+    :param FromIcao: ICAO of original assignment
+    :param ToIcao: ICAO of original assignment
+    :return: how passengers are available for return leg
+    """
+    query = f"SELECT Amount, UnitType FROM api_job WHERE FromIcao ='{ToIcao}' AND ToIcao ='{FromIcao}' AND UnitType='passengers'"
+    try:
+        results = cur.execute(query).fetchone()[0]
+        return results
+    except TypeError:
+        return None
