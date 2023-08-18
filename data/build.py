@@ -12,6 +12,8 @@ con = sql.connect('../db.sqlite3', check_same_thread=False)
 cur = con.cursor()
 
 
+
+
 def create_dbs():
     file_names = [file for file in listdir('.') if file.endswith('.csv')]
     for file_name in file_names:
@@ -56,6 +58,31 @@ def get_jobs():
     print('Finished getting data!')
 
 
+def get_aircraft_rentals():
+    aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350', 'Beechcraft Baron 58', 'Cessna Citation CJ4 (MSFS)',
+                     'Cessna 208 Caravan', 'Cessna 172 Skyhawk', 'Cessna 414A Chancellor',
+                     'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)', 'Socata TBM 930 (MSFS)']
+    headers = {}
+    payload = {}
+    df = pd.DataFrame()
+    for aircraft in aircrafts:
+        url = f'https://server.fseconomy.net/data?userkey={FSE_KEY}' \
+              f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft}'
+        print(f'Gathering aircraft data for {aircraft}...')
+        response = requests.request("GET", url, headers=headers, data=payload)
+        time.sleep(60)
+        if '<Error>' in response.text:
+            print(f'{response.status_code}: {response.text}')
+            pass
+        else:
+            df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
+        time.sleep(6)
+    df.drop(df[(df['RentalDry'] == 0) & (df['RentalWet'] == 0)].index, inplace=True)
+    df.drop(["Unnamed: 24"])
+    df.to_sql('api_aircraft_rentals', con, if_exists='replace', index=True)
+
+
 if __name__ == '__main__':
     create_dbs()
+    get_aircraft_rentals()
     get_jobs()

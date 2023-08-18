@@ -3,7 +3,6 @@ import geopy.distance
 import pandas as pd
 import requests
 from io import StringIO
-import json
 import os.path
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -94,10 +93,9 @@ def get_return_pax(FromIcao, ToIcao):
     Goes and hits the api_assignments db to find how many return pax exist for given assignment
     :param FromIcao: ICAO of original assignment
     :param ToIcao: ICAO of original assignment
-    :return: how many/much pax/cargo will be available for round trip
+    :return: how passengers are available for return leg
     """
     query = f"SELECT Amount, UnitType FROM api_job WHERE FromIcao ='{ToIcao}' AND ToIcao ='{FromIcao}' AND UnitType='passengers'"
-    print(FromIcao, ToIcao)
     try:
         results = cur.execute(query).fetchone()[0]
         return results
