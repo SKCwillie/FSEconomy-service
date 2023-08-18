@@ -87,3 +87,19 @@ def stringify_icao_list(icao_list, n=30):
     for sublist in icao_list:
         return_list.append('-'.join(sublist))
     return return_list
+
+
+def get_return_pax(FromIcao, ToIcao):
+    """
+    Goes and hits the api_assignments db to find how many return pax exist for given assignment
+    :param FromIcao: ICAO of original assignment
+    :param ToIcao: ICAO of original assignment
+    :return: how many/much pax/cargo will be available for round trip
+    """
+    query = f"SELECT Amount, UnitType FROM api_job WHERE FromIcao ='{ToIcao}' AND ToIcao ='{FromIcao}' AND UnitType='passengers'"
+    print(FromIcao, ToIcao)
+    try:
+        results = cur.execute(query).fetchone()[0]
+        return results
+    except TypeError:
+        return None

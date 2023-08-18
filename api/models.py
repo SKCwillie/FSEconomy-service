@@ -49,3 +49,17 @@ class Assignment(models.Model):
     Type = models.CharField(max_length=25)
     Pay = models.IntegerField()
     Distance = models.IntegerField()
+    ReturnAmount = models.IntegerField(null=True)
+
+
+class Job(models.Model):
+    index = models.IntegerField(primary_key=True)
+    FromIcao = models.CharField(max_length=4)
+    ToIcao = models.CharField(max_length=4)
+    Amount = models.IntegerField()
+    UnitType = models.CharField(max_length=25)
+    Type = models.CharField(max_length=25)
+    Pay = models.IntegerField()
+    Distance = models.IntegerField()
+    ReturnAmount = models.IntegerField(null=True)
+    ReturnType = models.CharField(max_length=50, null=True)

@@ -7,29 +7,33 @@ import time
 from dotenv import load_dotenv
 
 load_dotenv('../api/.env')
-FSE_KEY=os.getenv('FSE_KEY')
+FSE_KEY = os.getenv('FSE_KEY')
+con = sql.connect('../db.sqlite3', check_same_thread=False)
+cur = con.cursor()
+
 
 def create_dbs():
     file_names = [file for file in listdir('.') if file.endswith('.csv')]
-    con = sqlite3.connect("../db.sqlite3")
     for file_name in file_names:
         table_name = f"api_{file_name.split('.')[0]}"
         df = pd.read_csv(f'./{file_name}')
         df.to_sql(table_name, con, if_exists='replace', index=False)
-    con.close()
+    print('Successfully built starting dbs')
     pass
 
 
-def get_assignments():
+def get_jobs():
     icao_strings = stringify_icao_list(get_icao_list())
     df = pd.DataFrame()
     headers = {}
     payload = {}
+    count = 0
     for i in icao_strings:
         url = f'https://server.fseconomy.net/data?userkey={FSE_KEY}' \
               f'&format=csv&query=icao&search=jobsfrom&icaos={i}'
-        print(datetime.datetime.now().strftime('%H:%M:%S'))
         response = requests.request("GET", url, headers=headers, data=payload)
+        count += 1
+        print(f'Gathering data: {round(count * 100 / 30, 0)}%')
         time.sleep(60)
         if '<Error>' in response.text:
             print(f'{response.status_code}: {response.text}')
@@ -37,14 +41,21 @@ def get_assignments():
         else:
             df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
 
+    print('Grouping data...')
     assignments = df.groupby(['FromIcao', 'ToIcao', 'UnitType', 'Type'], as_index=False).agg(
         {'Amount': 'sum', 'Pay': 'sum'})
     assignments = assignments[['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay']]
+    print('Calculating distance...')
     assignments['Distance'] = assignments.apply(lambda x: get_distance(x['ToIcao'], x['FromIcao']), axis=1)
-    assignments = assignments.sort_values(by=['Pay'], ascending=False)
-    assignments.to_sql('api_assignments', con, if_exists='replace', index=True)
+    print('Writing to database...')
+    assignments.to_sql('api_job', con, if_exists='replace', index=True)
+    print('Finding return passengers...')
+    helper = pd.read_sql_query('SELECT * FROM api_job', con)
+    helper['ReturnPax'] = helper.apply(lambda row: get_return_pax(row['FromIcao'], row['ToIcao']), axis=1)
+    helper.to_sql('api_job', con, if_exists='replace', index=True)
+    print('Finished getting data!')
 
 
 if __name__ == '__main__':
-    # create_dbs()
-    get_assignments()
+    create_dbs()
+    get_jobs()
