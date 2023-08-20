@@ -49,7 +49,6 @@ class Assignment(models.Model):
     Type = models.CharField(max_length=25)
     Pay = models.IntegerField()
     Distance = models.IntegerField()
-    ReturnAmount = models.IntegerField(null=True)
 
 
 class Job(models.Model):
@@ -61,5 +60,4 @@ class Job(models.Model):
     Type = models.CharField(max_length=25)
     Pay = models.IntegerField()
     Distance = models.IntegerField()
-    ReturnAmount = models.IntegerField(null=True)
-    ReturnType = models.CharField(max_length=50, null=True)
+    ReturnPax = models.IntegerField(null=True)
