@@ -1,16 +1,20 @@
-import sqlite3
-from os import listdir
-import pandas as pd
-from api.scripts import *
-import time
+# When running on pythonanywhere, sys path will need to be added to be able to import scripts
+import sys
+
+sys.path.insert(0, '/home/skcwillie/FSEconomyV2')
 from dotenv import load_dotenv
+from os import listdir
+import sqlite3 as sql
+import pandas as pd
+import time
+import requests
+import os
+from api.scripts import get_icao_list, get_distance, stringify_icao_list, get_return_pax
 
 load_dotenv('../api/.env')
 FSE_KEY = os.getenv('FSE_KEY')
 con = sql.connect('../db.sqlite3', check_same_thread=False)
 cur = con.cursor()
-
-
 
 
 def create_dbs():
@@ -59,7 +63,7 @@ def get_jobs():
 
 def get_aircraft_rentals():
     aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350' 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
-                 'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter',  'Douglas DC-6B (PMDG)',
+                 'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)',
                  'Socata TBM 930 (MSFS)']
     headers = {}
     payload = {}
