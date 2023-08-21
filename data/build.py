@@ -9,7 +9,7 @@ import pandas as pd
 import time
 import requests
 import os
-from io ipmort StringIO
+from io import StringIO
 from api.scripts import get_icao_list, get_distance, stringify_icao_list, get_return_pax
 
 load_dotenv('../api/.env')
