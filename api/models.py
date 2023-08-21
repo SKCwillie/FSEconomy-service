@@ -61,3 +61,22 @@ class Job(models.Model):
     Pay = models.IntegerField()
     Distance = models.IntegerField()
     ReturnPax = models.IntegerField(null=True)
+
+
+class AircraftRental(models.Model):
+    index = models.IntegerField(primary_key=True)
+    SerialNumber = models.IntegerField()
+    MakeModel = models.CharField(max_length=100)
+    Location = models.CharField(max_length=4)
+    LocationName = models.CharField(max_length=100)
+    Home = models.CharField(max_length=100)
+    SalePrice = models.FloatField()
+    Equipment = models.CharField(max_length=100)
+    RentalDry = models.CharField(max_length=100)
+    RentalWet = models.CharField(max_length=100)
+    Bonus = models.FloatField()
+    RentalTime = models.IntegerField()
+    PctFuel = models.FloatField
+    NeedsRepair = models.IntegerField()
+    EngineTime = models.CharField(max_length=100)
+    TimeLast100h = models.CharField(max_length=100)
