@@ -1,4 +1,3 @@
-# When running on pythonanywhere, sys path will need to be added to be able to import scripts
 import sys
 
 sys.path.insert(0, '/home/skcwillie/FSEconomyV2')
@@ -26,6 +25,14 @@ def create_dbs():
         df.to_sql(table_name, con, if_exists='replace', index=False)
     print('Successfully built starting dbs')
     pass
+
+
+def clear_dbs():
+    tables = ['api_aircraft', 'api_aircraft_rentals', 'api_airport', 'api_assignment', 'api_job']
+    for table in tables:
+        cur.execute(f"DELETE FROM {table}")
+    con.commit()
+    print('Clearing tables...')
 
 
 def get_jobs():
@@ -63,13 +70,15 @@ def get_jobs():
 
 
 def get_aircraft_rentals():
-    aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350', 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
-                 'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)',
-                 'Socata TBM 930 (MSFS)']
+    # aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350', 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
+    #              'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)',
+    #              'Socata TBM 930 (MSFS)']
+    aircrafts = ['Beechcraft 18']
     headers = {}
     payload = {}
     df = pd.DataFrame()
     for aircraft in aircrafts:
+        aircraft = aircraft.replace(' ', '%20')
         url = f'https://server.fseconomy.net/data?userkey={FSE_KEY}' \
               f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft}'
         print(f'Gathering aircraft data for {aircraft}...')
@@ -86,10 +95,12 @@ def get_aircraft_rentals():
         df.drop(["Unnamed: 24"])
     except KeyError:
         pass
-    df.to_sql('api_aircraft_rentals', con, if_exists='replace', index=False)
+    df.to_sql('api_aircraftrental', con, if_exists='replace', index=False)
 
 
 if __name__ == '__main__':
+    #clear_dbs()
     create_dbs()
-    get_aircraft_rentals()
-    get_jobs()
+    #get_jobs()
+    #get_aircraft_rentals()
+    con.close()

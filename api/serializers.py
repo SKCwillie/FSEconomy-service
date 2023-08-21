@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Aircraft, Airport, Assignment, Job
+from .models import Aircraft, AircraftRental, Airport, Assignment, Job
 
 
 class AircraftSerializer(serializers.ModelSerializer):
@@ -45,6 +45,32 @@ class AircraftSerializer(serializers.ModelSerializer):
         return representation
 
 
+class AircraftRentalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AircraftRental
+        fields = ['SerialNumber', 'MakeModel', 'Location', 'LocaitonName', 'Home', 'SalePrice', 'Equipment',
+                  'RentalDry', 'RentalWet', 'Bonus', 'RentalTime', 'PctFuel', 'NeedsRepair', 'EngineTime',
+                  'TimeLast100hr']
+
+    def to_representation(self, instance):
+        representation = {
+            'MakeModel': instance.MakeModel,
+            'SerialNumber': instance.SerialNumber,
+            'Equipment': instance.Equipment,
+            'Home': instance.Home,
+            'NeedsRepair': instance.NeedsRepair,
+            'PctFuel': instance.PctFuel,
+            'Cost': {
+                'RentalDry': instance.RentalDry,
+                'RentalWet': instance.RentalWet,
+                'Bonus': instance.Bonus
+            },
+            'EngineTime': instance.EngineTime,
+            'TimeLast100h': instance.TimeLast100hr
+        }
+        return representation
+
+
 class AirportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airport
@@ -72,7 +98,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
-        fields = ['index', 'FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay', 'Distance', 'ReturnPax']
+        fields = ['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay', 'Distance', 'ReturnPax']
 
     def to_representation(self, instance):
         representation = {

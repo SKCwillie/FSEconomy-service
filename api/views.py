@@ -39,6 +39,9 @@ def get_assignments_by_airport(request, icao):
 
 
 def get_jobs(request, icao):
-    query_set = Job.objects.filter(FromIcao=icao.upper(), ReturnPax__gt=0)
-    serializer = JobSerializer(query_set, many=True)
-    return JsonResponse({icao.upper(): serializer.data}, safe=False)
+    job_query = Job.objects.filter(FromIcao=icao.upper(), ReturnPax__gt=0)
+    job_serializer = JobSerializer(job_query, many=True)
+    rental_query = AircraftRental.objects.filter(Location=icao.upper())
+    rental_serializer = AircraftRentalSerializer(rental_query, many=True)
+    return_json = {icao.upper(): job_serializer.data, 'Rentals': rental_serializer.data}
+    return JsonResponse(return_json, safe=False)
