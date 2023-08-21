@@ -63,7 +63,7 @@ def get_jobs():
 
 
 def get_aircraft_rentals():
-    aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350' 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
+    aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350', 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
                  'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)',
                  'Socata TBM 930 (MSFS)']
     headers = {}
