@@ -1,17 +1,21 @@
-import sqlite3
-from os import listdir
-import pandas as pd
-from api.scripts import *
-import datetime
-import time
+# When running on pythonanywhere, sys path will need to be added to be able to import scripts
+import sys
+
+sys.path.insert(0, '/home/skcwillie/FSEconomyV2')
 from dotenv import load_dotenv
+from os import listdir
+import sqlite3 as sql
+import pandas as pd
+import time
+import requests
+import os
+from io ipmort StringIO
+from api.scripts import get_icao_list, get_distance, stringify_icao_list, get_return_pax
 
 load_dotenv('../api/.env')
 FSE_KEY = os.getenv('FSE_KEY')
 con = sql.connect('../db.sqlite3', check_same_thread=False)
 cur = con.cursor()
-
-
 
 
 def create_dbs():
@@ -59,9 +63,9 @@ def get_jobs():
 
 
 def get_aircraft_rentals():
-    aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350', 'Beechcraft Baron 58', 'Cessna Citation CJ4 (MSFS)',
-                     'Cessna 208 Caravan', 'Cessna 172 Skyhawk', 'Cessna 414A Chancellor',
-                     'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)', 'Socata TBM 930 (MSFS)']
+    aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350' 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
+                 'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)',
+                 'Socata TBM 930 (MSFS)']
     headers = {}
     payload = {}
     df = pd.DataFrame()
@@ -78,8 +82,11 @@ def get_aircraft_rentals():
             df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
         time.sleep(6)
     df.drop(df[(df['RentalDry'] == 0) & (df['RentalWet'] == 0)].index, inplace=True)
-    df.drop(["Unnamed: 24"])
-    df.to_sql('api_aircraft_rentals', con, if_exists='replace', index=True)
+    try:
+        df.drop(["Unnamed: 24"])
+    except KeyError:
+        pass
+    df.to_sql('api_aircraft_rentals', con, if_exists='replace', index=False)
 
 
 if __name__ == '__main__':

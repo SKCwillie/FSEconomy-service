@@ -36,3 +36,9 @@ def get_assignments_by_airport(request, icao):
     serializer = AssignmentSerializer(query_set, many=True)
     cur.execute('DELETE FROM api_assignment')
     return JsonResponse(serializer.data, safe=False)
+
+
+def get_jobs(request, icao):
+    query_set = Job.objects.filter(FromIcao=icao.upper(), ReturnPax__gt=0)
+    serializer = JobSerializer(query_set, many=True)
+    return JsonResponse({icao.upper(): serializer.data}, safe=False)
