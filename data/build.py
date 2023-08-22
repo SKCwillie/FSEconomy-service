@@ -1,3 +1,4 @@
+import sqlite3
 import sys
 
 sys.path.insert(0, '/home/skcwillie/FSEconomyV2')
@@ -89,8 +90,33 @@ def get_aircraft_rentals():
     df.to_sql(table_name, con, if_exists='replace', index=False)
 
 
+def create_jobs_by_aircraft():
+    create_query = """
+        CREATE TABLE api_aircraftjob AS 
+        SELECT * FROM api_job 
+        LEFT JOIN api_aircraftrental 
+        ON api_job.FromIcao = api_aircraftrental.Location 
+        WHERE ReturnPax > 0 and MakeModel IS NOT NULL
+        """
+    delete_query = "DELETE FROM api_aircraftjob"
+    insert_query = """
+        INSERT INTO api_aircraftjob
+        SELECT * FROM api_job
+        LEFT JOIN api_aircraftrental
+        ON api_job.FromIcao = api_aircraftrental.Location
+        WHERE ReturnPax > 0 and MakeModel IS NOT NULL
+        """
+    try:
+        cur.execute(create_query)
+    except sqlite3.OperationalError:
+        cur.execute(delete_query)
+        cur.execute(insert_query)
+    con.commit()
+
+
 if __name__ == '__main__':
     create_dbs()
     get_jobs()
     get_aircraft_rentals()
+    create_jobs_by_aircraft()
     con.close()
