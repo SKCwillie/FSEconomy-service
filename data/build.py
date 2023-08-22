@@ -9,11 +9,11 @@ import time
 import requests
 import os
 from io import StringIO
-from api.scripts import get_icao_list, get_distance, stringify_icao_list, get_return_pax
+from api.scripts import get_icao_list, get_distance, stringify_icao_list, get_return_pax, db_path
 
 load_dotenv('../api/.env')
 FSE_KEY = os.getenv('FSE_KEY')
-con = sql.connect('../db.sqlite3', check_same_thread=False)
+con = sql.connect(db_path, check_same_thread=False)
 cur = con.cursor()
 
 
@@ -27,15 +27,8 @@ def create_dbs():
     pass
 
 
-def clear_dbs():
-    tables = ['api_aircraft', 'api_aircraft_rentals', 'api_airport', 'api_assignment', 'api_job']
-    for table in tables:
-        cur.execute(f"DELETE FROM {table}")
-    con.commit()
-    print('Clearing tables...')
-
-
 def get_jobs():
+    table_name = 'api_job'
     icao_strings = stringify_icao_list(get_icao_list())
     df = pd.DataFrame()
     headers = {}
@@ -65,15 +58,15 @@ def get_jobs():
     print('Finding return passengers...')
     helper = pd.read_sql_query('SELECT * FROM api_job', con)
     helper['ReturnPax'] = helper.apply(lambda row: get_return_pax(row['FromIcao'], row['ToIcao']), axis=1)
-    helper.to_sql('api_job', con, if_exists='replace', index=True)
+    helper.to_sql(table_name, con, if_exists='replace', index=True)
     print('Finished getting data!')
 
 
 def get_aircraft_rentals():
-    # aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350', 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
-    #              'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)',
-    #              'Socata TBM 930 (MSFS)']
-    aircrafts = ['Beechcraft 18']
+    aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350', 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
+                 'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)',
+                 'Socata TBM 930 (MSFS)']
+    table_name = "api_aircraftrental"
     headers = {}
     payload = {}
     df = pd.DataFrame()
@@ -95,12 +88,11 @@ def get_aircraft_rentals():
         df.drop(["Unnamed: 24"])
     except KeyError:
         pass
-    df.to_sql('api_aircraftrental', con, if_exists='replace', index=False)
+    df.to_sql(table_name, con, if_exists='replace', index=False)
 
 
 if __name__ == '__main__':
-    #clear_dbs()
     create_dbs()
-    #get_jobs()
-    #get_aircraft_rentals()
+    get_jobs()
+    get_aircraft_rentals()
     con.close()
