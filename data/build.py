@@ -71,19 +71,17 @@ def get_aircraft_rentals():
     payload = {}
     df = pd.DataFrame()
     for aircraft in aircrafts:
-        aircraft = aircraft.replace(' ', '%20')
         url = f'https://server.fseconomy.net/data?userkey={FSE_KEY}' \
-              f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft}'
+              f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft.replace(" ", "%20")}'
         print(f'Gathering aircraft data for {aircraft}...')
-        response = requests.request("GET", url, headers=headers, data=payload)
         time.sleep(60)
+        response = requests.request("GET", url, headers=headers, data=payload)
         if '<Error>' in response.text:
             print(f'{response.status_code}: {response.text}')
             pass
         else:
             df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
-        time.sleep(6)
-    df.drop(df[(df['RentalDry'] == 0) & (df['RentalWet'] == 0)].index, inplace=True)
+    df = df[(df['RentalDry'] > 0) | (df['RentalWet'] > 0)]
     try:
         df.drop(["Unnamed: 24"])
     except KeyError:
