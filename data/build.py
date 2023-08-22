@@ -114,7 +114,7 @@ def create_jobs_by_aircraft():
     con.commit()
 
 
-if __name__ == '__git main__':
+if __name__ == '__main__':
     create_dbs()
     get_jobs()
     get_aircraft_rentals()
