@@ -1,3 +1,4 @@
+import sqlite3
 import sys
 
 sys.path.insert(0, '/home/skcwillie/FSEconomyV2')
@@ -71,19 +72,17 @@ def get_aircraft_rentals():
     payload = {}
     df = pd.DataFrame()
     for aircraft in aircrafts:
-        aircraft = aircraft.replace(' ', '%20')
         url = f'https://server.fseconomy.net/data?userkey={FSE_KEY}' \
-              f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft}'
+              f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft.replace(" ", "%20")}'
         print(f'Gathering aircraft data for {aircraft}...')
-        response = requests.request("GET", url, headers=headers, data=payload)
         time.sleep(60)
+        response = requests.request("GET", url, headers=headers, data=payload)
         if '<Error>' in response.text:
             print(f'{response.status_code}: {response.text}')
             pass
         else:
             df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
-        time.sleep(6)
-    df.drop(df[(df['RentalDry'] == 0) & (df['RentalWet'] == 0)].index, inplace=True)
+    df = df[(df['RentalDry'] > 0) | (df['RentalWet'] > 0)]
     try:
         df.drop(["Unnamed: 24"])
     except KeyError:
@@ -91,8 +90,33 @@ def get_aircraft_rentals():
     df.to_sql(table_name, con, if_exists='replace', index=False)
 
 
+def create_jobs_by_aircraft():
+    create_query = """
+        CREATE TABLE api_aircraftjob AS 
+        SELECT * FROM api_job 
+        LEFT JOIN api_aircraftrental 
+        ON api_job.FromIcao = api_aircraftrental.Location 
+        WHERE ReturnPax > 0 and MakeModel IS NOT NULL
+        """
+    delete_query = "DELETE FROM api_aircraftjob"
+    insert_query = """
+        INSERT INTO api_aircraftjob
+        SELECT * FROM api_job
+        LEFT JOIN api_aircraftrental
+        ON api_job.FromIcao = api_aircraftrental.Location
+        WHERE ReturnPax > 0 and MakeModel IS NOT NULL
+        """
+    try:
+        cur.execute(create_query)
+    except sqlite3.OperationalError:
+        cur.execute(delete_query)
+        cur.execute(insert_query)
+    con.commit()
+
+
 if __name__ == '__main__':
     create_dbs()
     get_jobs()
     get_aircraft_rentals()
+    create_jobs_by_aircraft()
     con.close()
