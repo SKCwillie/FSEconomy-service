@@ -41,7 +41,7 @@ def get_jobs():
         response = requests.request("GET", url, headers=headers, data=payload)
         count += 1
         print(f'Gathering data: {round(count * 100 / 30, 0)}%')
-        time.sleep(60)
+        time.sleep(30)
         if '<Error>' in response.text:
             print(f'{response.status_code}: {response.text}')
             pass
