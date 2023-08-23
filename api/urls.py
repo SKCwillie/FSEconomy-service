@@ -25,5 +25,6 @@ urlpatterns = [
     path('airports/', views.airport_list),
     path('airport/<str:icao>', views.get_airport),
     path('assignments/<str:icao>', views.get_assignments_by_airport),
-    path('jobs/<str:icao>', views.get_jobs)
+    path('jobs/<str:icao>', views.get_jobs),
+    path('aircraftjobs/<str:aircraft>', views.get_jobs_by_aircraft)
 ]

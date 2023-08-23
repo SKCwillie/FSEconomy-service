@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Aircraft, AircraftRental, Airport, Assignment, Job
+from .models import Aircraft, AircraftRental, Airport, Assignment, Job, AircraftJob
 
 
 class AircraftSerializer(serializers.ModelSerializer):
@@ -109,5 +109,33 @@ class JobSerializer(serializers.ModelSerializer):
             'UnitType': instance.UnitType,
             'Type': instance.Type,
             'ReturnPax': instance.ReturnPax
+        }
+        return representation
+
+
+class AircraftJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AircraftJob
+        fields = ['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay', 'Distance', 'ReturnPax', 'SerialNumber',
+                  'MakeModel', 'Registration', 'Location', 'LocaitonName', 'Home', 'SalePrice', 'Equipment', 'RentalDry', 'RentalWet',
+                  'Bonus', 'RentalTime', 'PctFuel', 'NeedsRepair', 'EngineTime', 'TimeLast100hr']
+
+    def to_representation(self, instance):
+        representation = {
+            'Job': {
+                'FromIcao': instance.FromIcao,
+                'ToIcao': instance.ToIcao,
+                'Amount': instance.Amount,
+                'UnitType': instance.UnitType,
+                'ReturnPax': instance.ReturnPax,
+                'Pay': instance.Pay},
+            'Rental': {
+                'Registration': instance.Registration,
+                'Equipment': instance.Equipment,
+                'RentalDry': instance.RentalDry,
+                'RentalWet': instance.RentalWet,
+                'Bonus': instance.Bonus,
+                'NeedsRepair': instance.NeedsRepair
+            }
         }
         return representation

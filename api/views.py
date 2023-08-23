@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from .serializers import *
 from .scripts import *
 
-
 def aircraft_list(request):
     query_set = Aircraft.objects.all().order_by('ModelId')
     serializer = AircraftSerializer(query_set, many=True)
@@ -45,3 +44,10 @@ def get_jobs(request, icao):
     rental_serializer = AircraftRentalSerializer(rental_query, many=True)
     return_json = {icao.upper(): job_serializer.data, 'Rentals': rental_serializer.data}
     return JsonResponse(return_json, safe=False)
+
+
+def get_jobs_by_aircraft(request, aircraft):
+    aircraft = aliases[aircraft]
+    query_set = AircraftJob.objects.filter(MakeModel=aircraft)
+    serializer = AircraftJobSerializer(query_set, many=True)
+    return JsonResponse({aircraft: serializer.data}, safe=False)

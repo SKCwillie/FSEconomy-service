@@ -101,3 +101,17 @@ def get_return_pax(FromIcao, ToIcao):
         return results
     except TypeError:
         return None
+
+
+def get_alias_dict():
+    df = pd.read_csv(f'{BASE_DIR}/data/aircraftalias.csv')
+    alias_dict = {}
+    for index, row in df.iterrows():
+        try:
+            alias_dict[row['Alias'].replace(' ', '')] = row['MakeModel']
+        except AttributeError:
+            alias_dict[row['Alias']] = row['MakeModel']
+    return alias_dict
+
+
+aliases = get_alias_dict()
