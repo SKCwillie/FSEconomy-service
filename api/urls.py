@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from api import views
 
 urlpatterns = [
@@ -25,6 +25,6 @@ urlpatterns = [
     path('airports/', views.airport_list),
     path('airport/<str:icao>', views.get_airport),
     path('assignments/<str:icao>', views.get_assignments_by_airport),
-    path('jobs/<str:icao>', views.get_jobs),
-    path('aircraftjobs/<str:aircraft>', views.get_jobs_by_aircraft)
+    re_path(r'^jobs/(?P<icao>\w{3,4})\/$', views.get_jobs),
+    re_path(r'^jobs/(?P<aircraft>\w{5,})\/$', views.get_jobs_by_aircraft)
 ]

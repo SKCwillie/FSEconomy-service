@@ -126,6 +126,7 @@ class AircraftJobSerializer(serializers.ModelSerializer):
                 'FromIcao': instance.FromIcao,
                 'ToIcao': instance.ToIcao,
                 'Amount': instance.Amount,
+                'Distance': instance.Distance,
                 'UnitType': instance.UnitType,
                 'ReturnPax': instance.ReturnPax,
                 'Pay': instance.Pay},
