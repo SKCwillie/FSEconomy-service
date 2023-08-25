@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Aircraft, AircraftRental, Airport, Assignment, Job, AircraftJob
+from .scripts import get_financials
 
 
 class AircraftSerializer(serializers.ModelSerializer):
@@ -117,26 +118,39 @@ class AircraftJobSerializer(serializers.ModelSerializer):
     class Meta:
         model = AircraftJob
         fields = ['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay', 'Distance', 'ReturnPax', 'SerialNumber',
-                  'MakeModel', 'Registration', 'Location', 'LocaitonName', 'Home', 'SalePrice', 'Equipment', 'RentalDry', 'RentalWet',
+                  'MakeModel', 'Registration', 'Location', 'LocaitonName', 'Home', 'SalePrice', 'Equipment',
+                  'RentalDry', 'RentalWet',
                   'Bonus', 'RentalTime', 'PctFuel', 'NeedsRepair', 'EngineTime', 'TimeLast100hr']
 
     def to_representation(self, instance):
+        instance = get_financials(instance)
         representation = {
             'Job': {
                 'FromIcao': instance.FromIcao,
                 'ToIcao': instance.ToIcao,
-                'Amount': instance.Amount,
-                'Distance': instance.Distance,
+                'Amount': int(instance.Amount),
+                'Distance': int(instance.Distance),
                 'UnitType': instance.UnitType,
-                'ReturnPax': instance.ReturnPax,
-                'Pay': instance.Pay},
+                'ReturnPax': int(instance.ReturnPax),
+                'Pay': int(instance.Pay),
+            },
             'Rental': {
                 'Registration': instance.Registration,
                 'Equipment': instance.Equipment,
-                'RentalDry': instance.RentalDry,
-                'RentalWet': instance.RentalWet,
-                'Bonus': instance.Bonus,
-                'NeedsRepair': instance.NeedsRepair
-            }
+                'RentalDry': int(instance.RentalDry),
+                'RentalWet': int(instance.RentalWet),
+                'Bonus': int(instance.Bonus),
+                'NeedsRepair': bool(instance.NeedsRepair)
+            },
+            'Financial': {
+                'NetPay': instance.NetPay,
+                'PaxTo': instance.PaxTo,
+                'PaxFrom': instance.PaxFrom,
+                'RentalCost': instance.RentalCost,
+                'BookingFeeTo': instance.BookingFeeTo,
+                'BookingFeeFrom': instance.BookingFeeFrom,
+                'Earnings': instance.Earnings,
+                'Earnings/Hr': instance.EarningsPerHr
         }
+    }
         return representation

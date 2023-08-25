@@ -9,6 +9,8 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 db_path = os.path.join(BASE_DIR, "db.sqlite3")
 con = sql.connect(db_path, check_same_thread=False)
 cur = con.cursor()
+FUEL_PRICE = 4.50
+LANDING_TIME = .25
 
 
 def get_icao_list():
@@ -104,6 +106,10 @@ def get_return_pax(FromIcao, ToIcao):
 
 
 def get_alias_dict():
+    """
+    Reads the CSV with aircraft aliases to format the aliases more digestable for the datafeed
+    :return: A dict with aliases (with removed spaces) as keys and the actuaal makeModel as values
+    """
     df = pd.read_csv(f'{BASE_DIR}/data/aircraftalias.csv')
     alias_dict = {}
     for index, row in df.iterrows():
@@ -115,3 +121,61 @@ def get_alias_dict():
 
 
 aliases = get_alias_dict()
+
+
+def get_financials(instance):
+    """
+    Takes an instance of the AircraftJobsSerializer class to calculate cost and profits for job
+    :param instance: instance of class
+    :return:
+    """
+    query = f"""
+    SELECT GPH, CruiseSpeed, Seats, Crew
+    FROM api_aircraft 
+    WHERE MakeModel = '{instance.MakeModel}'"""
+    fuel_burn, cruise_speed, seats, crew = cur.execute(query).fetchone()
+    job_time = 2 * instance.Distance / cruise_speed + LANDING_TIME
+    dry_cost = job_time * (instance.RentalDry + fuel_burn + FUEL_PRICE)
+    wet_cost = job_time * instance.RentalWet
+    # This is clunky but there needs to be checks incase the owner doesn't allow for dry and wet rental
+    if instance.RentalWet == 0:
+        rental_cost = dry_cost
+    elif instance.RentalDry == 0:
+        rental_cost = wet_cost
+    elif dry_cost > wet_cost:
+        rental_cost = wet_cost
+    else:
+        rental_cost = dry_cost
+
+    max_pax = seats - crew - 1
+    dollar_per_pax = round(instance.Pay / instance.Amount, 2)
+    if instance.Amount > max_pax:
+        pax_to = max_pax
+    else:
+        pax_to = instance.Amount
+    if instance.ReturnPax > max_pax:
+        pax_from = max_pax
+    else:
+        pax_from = instance.ReturnPax
+    net_pay = (pax_to + pax_from) * dollar_per_pax
+    ground_crew_fee = net_pay * .10
+    if pax_to > 4:
+        booking_fee_to = round(pax_to * .01, 2) * net_pay
+    else:
+        booking_fee_to = 0
+    if pax_from > 4:
+        booking_fee_from = round(pax_from * .01, 2) * net_pay
+    else:
+        booking_fee_from = 0
+    earnings = round(net_pay - rental_cost - booking_fee_from - booking_fee_to - ground_crew_fee, 2)
+    instance.NetPay = round(net_pay, 2)
+    instance.PaxTo = int(round(pax_to, 0))
+    instance.PaxFrom = int(round(pax_from, 0))
+    instance.RentalCost = round(rental_cost, 2)
+    instance.RentalDryCost = round(dry_cost, 2)
+    instance.RentalWetCost = round(wet_cost, 2)
+    instance.BookingFeeTo = round(booking_fee_to, 2)
+    instance.BookingFeeFrom = round(booking_fee_from, 2)
+    instance.Earnings = round(earnings, 2)
+    instance.EarningsPerHr = int(round(earnings / job_time, 0))
+    return instance
