@@ -48,6 +48,6 @@ def get_jobs(request, icao):
 
 def get_jobs_by_aircraft(request, aircraft):
     aircraft = aliases[aircraft]
-    query_set = AircraftJob.objects.filter(MakeModel=aircraft)
+    query_set = AircraftJob.objects.filter(MakeModel=aircraft, UnitType='passengers')
     serializer = AircraftJobSerializer(query_set, many=True)
     return JsonResponse({aircraft: serializer.data}, safe=False)
