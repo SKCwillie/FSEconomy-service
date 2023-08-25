@@ -55,6 +55,10 @@ def get_jobs():
     print('Calculating distance...')
     assignments['Distance'] = assignments.apply(lambda x: get_distance(x['ToIcao'], x['FromIcao']), axis=1)
     print('Writing to database...')
+    try:
+        assignments = assignments.loc[:, ~assignments.columns.str.contains('^Unnamed')]
+    except KeyError:
+        pass
     assignments.to_sql('api_job', con, if_exists='replace', index=True)
     print('Finding return passengers...')
     helper = pd.read_sql_query('SELECT * FROM api_job', con)
@@ -84,7 +88,7 @@ def get_aircraft_rentals():
             df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
     df = df[(df['RentalDry'] > 0) | (df['RentalWet'] > 0)]
     try:
-        df.drop(["Unnamed: 24"])
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
     except KeyError:
         pass
     df.to_sql(table_name, con, if_exists='replace', index=False)
