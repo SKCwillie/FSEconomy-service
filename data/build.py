@@ -112,10 +112,13 @@ def create_jobs_by_aircraft():
         """
     try:
         cur.execute(create_query)
+        print('Trying to create aircraft_job db')
     except sqlite3.OperationalError:
+        print('Table exist, inserting data')
         cur.execute(delete_query)
         cur.execute(insert_query)
     con.commit()
+    print('aircraftrental created')
 
 
 if __name__ == '__main__':
