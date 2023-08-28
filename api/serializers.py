@@ -150,7 +150,7 @@ class AircraftJobSerializer(serializers.ModelSerializer):
                 'BookingFeeTo': instance.BookingFeeTo,
                 'BookingFeeFrom': instance.BookingFeeFrom,
                 'Earnings': instance.Earnings,
-                'Earnings/Hr': instance.EarningsPerHr
+                'EarningsPerHr': instance.EarningsPerHr
         }
     }
         return representation
