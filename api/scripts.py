@@ -105,6 +105,16 @@ def get_return_pax(FromIcao, ToIcao):
         return None
 
 
+def get_max_pax(aircraft):
+    print(aircraft)
+    query = f"SELECT Seats FROM api_aircraft WHERE MakeModel = '{aircraft}'"
+    try:
+        seats = cur.execute(query).fetchone()[0]
+        return int(round((seats - 1) * 0.7, 0))
+    except TypeError:
+        return None
+
+
 def get_alias_dict():
     """
     Reads the CSV with aircraft aliases to format the aliases more digestable for the datafeed

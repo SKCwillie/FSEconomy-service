@@ -59,11 +59,11 @@ def get_jobs():
         assignments = assignments.loc[:, ~assignments.columns.str.contains('^Unnamed')]
     except KeyError:
         pass
-    assignments.to_sql('api_job', con, if_exists='replace', index=True)
+    assignments.to_sql('api_job', con, if_exists='replace', index=False)
     print('Finding return passengers...')
     helper = pd.read_sql_query('SELECT * FROM api_job', con)
     helper['ReturnPax'] = helper.apply(lambda row: get_return_pax(row['FromIcao'], row['ToIcao']), axis=1)
-    helper.to_sql(table_name, con, if_exists='replace', index=True)
+    helper.to_sql(table_name, con, if_exists='replace', index=False)
     print('Finished getting data!')
 
 
@@ -102,23 +102,12 @@ def create_jobs_by_aircraft():
         ON api_job.FromIcao = api_aircraftrental.Location 
         WHERE ReturnPax > 0 and MakeModel IS NOT NULL
         """
-    delete_query = "DELETE FROM api_aircraftjob"
-    insert_query = """
-        INSERT INTO api_aircraftjob
-        SELECT * FROM api_job
-        LEFT JOIN api_aircraftrental
-        ON api_job.FromIcao = api_aircraftrental.Location
-        WHERE ReturnPax > 0 and MakeModel IS NOT NULL
-        """
-    try:
-        cur.execute(create_query)
-        print('Trying to create aircraft_job db')
-    except sqlite3.OperationalError:
-        print('Table exist, inserting data')
-        cur.execute(delete_query)
-        cur.execute(insert_query)
-    con.commit()
-    print('aircraftrental created')
+    delete_query = "DROP TABLE api_aircraftjob"
+    print('Deleting aircraftjob db')
+    cur.execute(delete_query)
+    print('Creating aircraftjob db')
+    cur.execute(create_query)
+    print('aircraftjob db created')
 
 
 if __name__ == '__main__':
