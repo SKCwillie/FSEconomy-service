@@ -1,3 +1,4 @@
 api/.env
 /venv/
 db.sqlite3-journal
+db.sqlite3
