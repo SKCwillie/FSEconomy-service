@@ -63,7 +63,7 @@ def get_jobs():
     print('Finding return passengers...')
     helper = pd.read_sql_query('SELECT * FROM api_job', con)
     helper['ReturnPax'] = helper.apply(lambda row: get_return_pax(row['FromIcao'], row['ToIcao']), axis=1)
-    helper.to_sql(table_name, con, if_exists='replace', index=False)
+    helper.to_sql(table_name, con, if_exists='replace', index=True)
     print('Finished getting data!')
 
 
@@ -91,7 +91,7 @@ def get_aircraft_rentals():
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
     except KeyError:
         pass
-    df.to_sql(table_name, con, if_exists='replace', index=False)
+    df.to_sql(table_name, con, if_exists='replace', index=True)
 
 
 def create_jobs_by_aircraft():
