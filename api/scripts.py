@@ -124,7 +124,8 @@ def get_alias_dict():
     alias_dict = {}
     for index, row in df.iterrows():
         try:
-            alias_dict[row['Alias'].replace(' ', '')] = row['MakeModel']
+            key = row['Alias'].replace(' ', '').lower()
+            alias_dict[key] = row['MakeModel']
         except AttributeError:
             alias_dict[row['Alias']] = row['MakeModel']
     return alias_dict

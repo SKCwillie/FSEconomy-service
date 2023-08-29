@@ -48,7 +48,7 @@ def get_jobs(request, icao):
 
 
 def get_jobs_by_aircraft(request, aircraft):
-    aircraft = aliases[aircraft]
+    aircraft = aliases[aircraft.lower()]
     seats = get_max_pax(aircraft)
     query_set = AircraftJob.objects.filter(MakeModel=aircraft, UnitType='passengers', Amount__gt=seats, ReturnPax__gt=seats, Amount__lt=50)
     serializer = AircraftJobSerializer(query_set, many=True)
