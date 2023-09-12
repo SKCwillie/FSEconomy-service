@@ -7,7 +7,7 @@ import os.path
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 db_path = os.path.join(BASE_DIR, "db.sqlite3")
-con = sql.connect(db_path, check_same_thread=False)
+con = sql.connect(db_path, check_same_thread=False, timeout=10)
 cur = con.cursor()
 FUEL_PRICE = 4.50
 LANDING_TIME = .25
@@ -120,7 +120,7 @@ def get_alias_dict():
     Reads the CSV with aircraft aliases to format the aliases more digestable for the datafeed
     :return: A dict with aliases (with removed spaces) as keys and the actuaal makeModel as values
     """
-    df = pd.read_csv(f'{BASE_DIR}/data/aircraftalias.csv')
+    df = pd.read_csv(f'{BASE_DIR}/data/aircraftalias.csv', sep=';')
     alias_dict = {}
     for index, row in df.iterrows():
         try:
