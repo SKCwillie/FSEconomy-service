@@ -22,7 +22,7 @@ def create_dbs():
     file_names = [file for file in listdir('.') if file.endswith('.csv')]
     for file_name in file_names:
         table_name = f"api_{file_name.split('.')[0]}"
-        df = pd.read_csv(f'./{file_name}')
+        df = pd.read_csv(f'./{file_name}', sep=';')
         df.to_sql(table_name, con, if_exists='replace', index=False)
     print('Successfully built starting dbs')
     pass
