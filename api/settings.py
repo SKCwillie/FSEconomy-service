@@ -28,7 +28,7 @@ load_dotenv()
 SECRET_KEY = os.getenv('APP_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['api.fseconomy-service.com', '127.0.0.1', 'localhost']
 
