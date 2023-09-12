@@ -107,3 +107,8 @@ class AircraftJob(models.Model):
     NeedsRepair = models.IntegerField()
     EngineTime = models.CharField(max_length=100)
     TimeLast100hr = models.CharField(max_length=100)
+
+
+class AvailableAircraft(models.Model):
+    id = models.IntegerField(primary_key=True)
+    makeModel = models.CharField(max_length=200)
