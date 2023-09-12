@@ -10,6 +10,11 @@ def aircraft_list(request):
 
 
 def get_aircraft(request, model_id):
+    try:
+        int(model_id)
+    except ValueError:
+        model_id = aliases[model_id.lower().replace(' ', '')][1]
+    print(model_id)
     query_set = Aircraft.objects.filter(ModelId=model_id)
     serializer = AircraftSerializer(query_set, many=True)
     return JsonResponse(serializer.data[0], safe=False)
@@ -48,7 +53,7 @@ def get_jobs(request, icao):
 
 
 def get_jobs_by_aircraft(request, aircraft):
-    aircraft = aliases[aircraft.lower()]
+    aircraft = aliases[aircraft.lower().replace(' ', '')][0]
     seats = get_max_pax(aircraft)
     query_set = AircraftJob.objects.filter(MakeModel=aircraft, UnitType='passengers', Amount__gt=seats, ReturnPax__gt=seats, Amount__lt=50)
     serializer = AircraftJobSerializer(query_set, many=True)

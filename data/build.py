@@ -112,7 +112,7 @@ def create_jobs_by_aircraft():
 
 if __name__ == '__main__':
     create_dbs()
-    # get_jobs()
-    # get_aircraft_rentals()
-    # create_jobs_by_aircraft()
+    get_jobs()
+    get_aircraft_rentals()
+    create_jobs_by_aircraft()
     con.close()

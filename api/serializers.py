@@ -146,6 +146,7 @@ class AircraftJobSerializer(serializers.ModelSerializer):
                 'NetPay': instance.NetPay,
                 'PaxTo': instance.PaxTo,
                 'PaxFrom': instance.PaxFrom,
+                'BestRental': instance.BestRental,
                 'RentalCost': instance.RentalCost,
                 'BookingFeeTo': instance.BookingFeeTo,
                 'BookingFeeFrom': instance.BookingFeeFrom,

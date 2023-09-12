@@ -9,7 +9,7 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 db_path = os.path.join(BASE_DIR, "db.sqlite3")
 con = sql.connect(db_path, check_same_thread=False, timeout=10)
 cur = con.cursor()
-FUEL_PRICE = 4.50
+FUEL_PRICE = 4
 LANDING_TIME = .25
 
 
@@ -125,9 +125,9 @@ def get_alias_dict():
     for index, row in df.iterrows():
         try:
             key = row['Alias'].replace(' ', '').lower()
-            alias_dict[key] = row['MakeModel']
+            alias_dict[key] = [row['MakeModel'], row['ModelId']]
         except AttributeError:
-            alias_dict[row['Alias']] = row['MakeModel']
+            alias_dict[row['Alias']] = [row['MakeModel'], row['ModelId']]
     return alias_dict
 
 
@@ -151,12 +151,16 @@ def get_financials(instance):
     # This is clunky but there needs to be checks incase the owner doesn't allow for dry and wet rental
     if instance.RentalWet == 0:
         rental_cost = dry_cost
+        best_rental = 'dry'
     elif instance.RentalDry == 0:
         rental_cost = wet_cost
+        best_rental = 'wet'
     elif dry_cost > wet_cost:
         rental_cost = wet_cost
+        best_rental = 'wet'
     else:
         rental_cost = dry_cost
+        best_rental = 'dry'
 
     max_pax = seats - crew - 1
     dollar_per_pax = round(instance.Pay / instance.Amount, 2)
@@ -189,4 +193,5 @@ def get_financials(instance):
     instance.BookingFeeFrom = round(booking_fee_from, 2)
     instance.Earnings = round(earnings, 2)
     instance.EarningsPerHr = int(round(earnings / job_time, 0))
+    instance.BestRental = best_rental
     return instance
