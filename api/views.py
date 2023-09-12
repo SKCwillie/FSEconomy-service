@@ -3,9 +3,20 @@ from .serializers import *
 from .scripts import *
 
 
+def status(request):
+    status_response = {'message': 'up'}
+    return JsonResponse(status_response)
+
+
 def aircraft_list(request):
     query_set = Aircraft.objects.all().order_by('ModelId')
     serializer = AircraftSerializer(query_set, many=True)
+    return JsonResponse(serializer.data, safe=False)
+
+
+def available_aircraft(request):
+    query_set = AvailableAircraft.objects.all()
+    serializer = AvailableAircraftSerializer(query_set, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 

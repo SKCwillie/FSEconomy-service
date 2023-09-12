@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Aircraft, AircraftRental, Airport, Assignment, Job, AircraftJob
+from .models import Aircraft, AircraftRental, Airport, Assignment, Job, AircraftJob, AvailableAircraft
 from .scripts import get_financials
 
 
@@ -44,6 +44,12 @@ class AircraftSerializer(serializers.ModelSerializer):
         }
 
         return representation
+
+
+class AvailableAircraftSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AvailableAircraft
+        fields = ['id', 'makeModel']
 
 
 class AircraftRentalSerializer(serializers.ModelSerializer):
@@ -152,6 +158,6 @@ class AircraftJobSerializer(serializers.ModelSerializer):
                 'BookingFeeFrom': instance.BookingFeeFrom,
                 'Earnings': instance.Earnings,
                 'EarningsPerHr': instance.EarningsPerHr
+            }
         }
-    }
         return representation

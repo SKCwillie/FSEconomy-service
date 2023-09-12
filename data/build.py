@@ -28,6 +28,15 @@ def create_dbs():
     pass
 
 
+def get_aircraft_list():
+    aircraft_list = []
+    query = 'SELECT * FROM api_availableaircraft'
+    query_results = con.execute(query).fetchall()
+    for result in query_results:
+        aircraft_list.append(result[1])
+    return aircraft_list
+
+
 def get_jobs():
     table_name = 'api_job'
     icao_strings = stringify_icao_list(get_icao_list())
@@ -67,15 +76,12 @@ def get_jobs():
     print('Finished getting data!')
 
 
-def get_aircraft_rentals():
-    aircrafts = ['Beechcraft 18', 'Beechcraft King Air 350', 'Cessna Citation CJ4 (MSFS)', 'Cessna 208 Caravan',
-                 'Cessna 414A Chancellor', 'DeHavilland DHC-6 Twin Otter', 'Douglas DC-6B (PMDG)',
-                 'Socata TBM 930 (MSFS)']
+def get_aircraft_rentals(aircraft_list):
     table_name = "api_aircraftrental"
     headers = {}
     payload = {}
     df = pd.DataFrame()
-    for aircraft in aircrafts:
+    for aircraft in aircraft_list:
         url = f'https://server.fseconomy.net/data?userkey={FSE_KEY}' \
               f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft.replace(" ", "%20")}'
         print(f'Gathering aircraft data for {aircraft}...')
@@ -112,7 +118,8 @@ def create_jobs_by_aircraft():
 
 if __name__ == '__main__':
     create_dbs()
+    AVAILABLE_AIRCRAFT = get_aircraft_list()
     get_jobs()
-    get_aircraft_rentals()
+    get_aircraft_rentals(AVAILABLE_AIRCRAFT)
     create_jobs_by_aircraft()
     con.close()

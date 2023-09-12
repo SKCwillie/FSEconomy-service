@@ -20,11 +20,13 @@ from api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('status', views.status),
     path('aircrafts/', views.aircraft_list),
     path('aircraft/<str:model_id>/', views.get_aircraft),
     path('airports/', views.airport_list),
     path('airport/<str:icao>', views.get_airport),
     path('assignments/<str:icao>', views.get_assignments_by_airport),
+    path('aircrafts/jobs/available', views.available_aircraft),
     re_path(r'^jobs/(?P<icao>\w{3,4})\/$', views.get_jobs),
     re_path(r'^jobs/(?P<aircraft>\w{5,})\/$', views.get_jobs_by_aircraft)
 ]
