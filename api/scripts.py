@@ -29,8 +29,8 @@ def get_coords(icao):
     :param icao: airport identifier from airports db
     :return: latitude and longitude of airport
     """
-    lat = cur.execute(f"SELECT lat FROM api_airport WHERE icao='{icao}'").fetchone()[0]
-    lon = cur.execute(f"SELECT lon FROM api_airport WHERE icao='{icao}'").fetchone()[0]
+    lat = cur.execute(f"SELECT lat FROM api_airport WHERE icao='{icao.upper()}'").fetchone()[0]
+    lon = cur.execute(f"SELECT lon FROM api_airport WHERE icao='{icao.upper()}'").fetchone()[0]
     return lat, lon
 
 
@@ -51,7 +51,6 @@ def get_assignments(user_key, icao):
     """
     Takes an airport ICAO and fetches the assignments available at it
     Groups assignments with the same to and from ICAO
-    Returns info in JSON format
     :param user_key: key from FSEconomy datafeed
     :param icao: 3 or 4 digit string
     """
@@ -71,8 +70,8 @@ def get_assignments(user_key, icao):
         {'Amount': 'sum', 'Pay': 'sum'})
     assignments = assignments[['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay']]
     assignments['Distance'] = assignments.apply(lambda x: get_distance(x['ToIcao'], x['FromIcao']), axis=1)
-    assignments.to_sql('api_assignment', con, if_exists='append')
-    pass
+    assignments.to_sql('api_assignment', con, if_exists='replace')
+    return assignments
 
 
 def stringify_icao_list(icao_list, n=30):
@@ -84,6 +83,8 @@ def stringify_icao_list(icao_list, n=30):
     :return: a list of strings formatted to easily hit the datafeed
     """
     return_list = []
+    if n > len(icao_list):
+        n = len(icao_list)
     icao_list = [icao_list[i::n] for i in range(n)]
     for sublist in icao_list:
         return_list.append('-'.join(sublist))
