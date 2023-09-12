@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from .serializers import *
 from .scripts import *
 
+
 def aircraft_list(request):
     query_set = Aircraft.objects.all().order_by('ModelId')
     serializer = AircraftSerializer(query_set, many=True)
@@ -9,6 +10,10 @@ def aircraft_list(request):
 
 
 def get_aircraft(request, model_id):
+    try:
+        int(model_id)
+    except ValueError:
+        model_id = aliases[model_id][1]
     query_set = Aircraft.objects.filter(ModelId=model_id)
     serializer = AircraftSerializer(query_set, many=True)
     return JsonResponse(serializer.data[0], safe=False)

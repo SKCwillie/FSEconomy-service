@@ -29,8 +29,8 @@ def get_coords(icao):
     :param icao: airport identifier from airports db
     :return: latitude and longitude of airport
     """
-    lat = cur.execute(f"SELECT lat FROM api_airport WHERE icao='{icao}'").fetchone()[0]
-    lon = cur.execute(f"SELECT lon FROM api_airport WHERE icao='{icao}'").fetchone()[0]
+    lat = cur.execute(f"SELECT lat FROM api_airport WHERE icao='{icao.upper()}'").fetchone()[0]
+    lon = cur.execute(f"SELECT lon FROM api_airport WHERE icao='{icao.upper()}'").fetchone()[0]
     return lat, lon
 
 
@@ -110,13 +110,13 @@ def get_alias_dict():
     Reads the CSV with aircraft aliases to format the aliases more digestable for the datafeed
     :return: A dict with aliases (with removed spaces) as keys and the actuaal makeModel as values
     """
-    df = pd.read_csv(f'{BASE_DIR}/data/aircraftalias.csv')
+    df = pd.read_csv(f'{BASE_DIR}/data/aircraftalias.csv', sep=';')
     alias_dict = {}
     for index, row in df.iterrows():
         try:
-            alias_dict[row['Alias'].replace(' ', '')] = row['MakeModel']
+            alias_dict[row['Alias'].replace(' ', '')] = [row['MakeModel'], row['ModelId']]
         except AttributeError:
-            alias_dict[row['Alias']] = row['MakeModel']
+            alias_dict[row['Alias']] = [row['MakeModel'], row['ModelId']]
     return alias_dict
 
 
