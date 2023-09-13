@@ -1,3 +1,4 @@
+from unittest import main
 import unittest
 from scripts import *
 import pandas as pd
@@ -7,34 +8,28 @@ load_dotenv('../api/.env')
 FSE_KEY = os.getenv('FSE_KEY')
 
 
-class TestGetIcaoList(unittest.TestCase):
-    def test_first(self):
+class TestScripts(unittest.TestCase):
+    def test_icao_list_first(self):
         actual = get_icao_list()[0]
         expected = '00V'
         self.assertEqual(actual, expected)
 
-    def test_last(self):
+    def test_icao_list_last(self):
         actual = get_icao_list()[-1]
         expected = 'Z71'
         self.assertEqual(actual, expected)
 
-
-class TestGetCoords(unittest.TestCase):
-    def test_g3v(self):
+    def test_get_coords(self):
         self.assertEqual(get_coords('3GV'), (39.0156, -94.2133))
         self.assertEqual(get_coords('KMIA'), (25.7932, -80.2906))
 
-
-class TestGetDistance(unittest.TestCase):
-    def test_mkc_to_mci(self):
+    def test_dist_mkc_to_mci(self):
         self.assertEqual(get_distance('KMKC', 'kmci'), 12)
 
-    def test_atl_to_lax(self):
+    def test_dist_atl_to_lax(self):
         self.assertEqual(get_distance('kAtl', 'KLax'), 1691)
 
-
-class TestGetAssignments(unittest.TestCase):
-    def test_function(self):
+    def test_get_assignments(self):
         icao = 'KLXT'
         assignments = get_assignments(FSE_KEY, icao)
         returned_icao = assignments[0]['FromIcao']
@@ -42,14 +37,12 @@ class TestGetAssignments(unittest.TestCase):
         self.assertEqual(icao, returned_icao)
         self.assertGreater(returned_dist, 0)
 
-
-class TestStringifyIcaoList(unittest.TestCase):
-    def test_n(self):
+    def test_stringyfy_icao_list(self):
         test_list = ['3GV', 'KMKC', 'KMCI', 'KATL', 'KCLT']
         self.assertEqual(stringify_icao_list(test_list), ['3GV', 'KMKC', 'KMCI', 'KATL', 'KCLT'])
         self.assertEqual(stringify_icao_list(test_list, n=2), ['3GV-KMCI-KCLT', 'KMKC-KATL'])
 
-    def test_icao_list(self):
+    def test_get_icao_list(self):
         icao_list = get_icao_list()
         stringified_list = stringify_icao_list(icao_list)
         self.assertEqual(len(icao_list), 1092)
