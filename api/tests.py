@@ -36,8 +36,11 @@ class TestGetDistance(unittest.TestCase):
 class TestGetAssignments(unittest.TestCase):
     def test_function(self):
         icao = 'KLXT'
-        df = get_assignments(FSE_KEY, icao)
-        self.assertEqual(df.iloc[0, 0], icao)
+        assignments = get_assignments(FSE_KEY, icao)
+        returned_icao = assignments[0]['FromIcao']
+        returned_dist = assignments[0]['Distance']
+        self.assertEqual(icao, returned_icao)
+        self.assertGreater(returned_dist, 0)
 
 
 class TestStringifyIcaoList(unittest.TestCase):
