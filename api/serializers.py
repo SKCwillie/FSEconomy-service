@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Aircraft, AircraftRental, Airport, Assignment, Job, AircraftJob, AvailableAircraft
+from .models import Aircraft, AircraftRental, Airport, Job, AircraftJob, AvailableAircraft
 from .scripts import get_financials
 
 
@@ -82,24 +82,6 @@ class AirportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airport
         fields = ['icao', 'lat', 'lon', 'type', 'size', 'name', 'city', 'state', 'country']
-
-
-class AssignmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Assignment
-        fields = ['index', 'FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay', 'Distance']
-
-    def to_representation(self, instance):
-        representation = {
-            'FromIcao': instance.FromIcao,
-            'ToIcao': instance.ToIcao,
-            'Distance': instance.Distance,
-            'Pay': instance.Pay,
-            'Amount': instance.Amount,
-            'UnitType': instance.UnitType,
-            'Type': instance.Type
-        }
-        return representation
 
 
 class JobSerializer(serializers.ModelSerializer):

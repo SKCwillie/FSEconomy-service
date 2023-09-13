@@ -47,11 +47,7 @@ def get_airport(request, icao):
 
 def get_assignments_by_airport(request, icao):
     user_key = request.headers['userkey']
-    get_assignments(user_key, icao)
-    query_set = Assignment.objects.all()
-    serializer = AssignmentSerializer(query_set, many=True)
-    cur.execute('DELETE FROM api_assignment')
-    return JsonResponse(serializer.data, safe=False)
+    return JsonResponse(get_assignments(user_key, icao), safe=False)
 
 
 def get_jobs(request, icao):

@@ -4,6 +4,7 @@ import pandas as pd
 import requests
 from io import StringIO
 import os.path
+import json
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 db_path = os.path.join(BASE_DIR, "db.sqlite3")
@@ -70,8 +71,9 @@ def get_assignments(user_key, icao):
         {'Amount': 'sum', 'Pay': 'sum'})
     assignments = assignments[['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay']]
     assignments['Distance'] = assignments.apply(lambda x: get_distance(x['ToIcao'], x['FromIcao']), axis=1)
-    assignments.to_sql('api_assignment', con, if_exists='replace')
-    return assignments
+    assignments_json = assignments.to_json(orient='records')
+    return json.loads(assignments_json)
+
 
 
 def stringify_icao_list(icao_list, n=30):
