@@ -37,33 +37,45 @@ def get_aircraft_list():
     return aircraft_list
 
 
+def get_data(url, df, headers={}, payload={}, error_count=0):
+    errors_allowed = 10
+    response = requests.request("GET", url, headers=headers, data=payload)
+    if error_count == errors_allowed:
+        print('Skipping')
+        return df
+    elif '<Error>' in response.text and error_count < 10:
+        print(f'Trying Again: {errors_allowed - error_count} attempts left before skipping')
+        error_count += 1
+        get_data(url, df, error_count=error_count)
+    else:
+        df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
+    return df
+
+
 def get_jobs():
     table_name = 'api_job'
     icao_strings = stringify_icao_list(get_icao_list())
     df = pd.DataFrame()
-    headers = {}
-    payload = {}
-    count = 0
+    count = 1
     for i in icao_strings:
+        print(f'Gathering data: {int(round(count * 100 / 30, 0))}%')
         url = f'https://server.fseconomy.net/data?userkey={FSE_KEY}' \
               f'&format=csv&query=icao&search=jobsfrom&icaos={i}'
-        response = requests.request("GET", url, headers=headers, data=payload)
+        df = get_data(url, df)
         count += 1
-        print(f'Gathering data: {round(count * 100 / 30, 0)}%')
         time.sleep(60)
-        if '<Error>' in response.text:
-            print(f'{response.status_code}: {response.text}')
-            pass
-        else:
-            df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
 
     print('Grouping data...')
-    assignments = df.groupby(['FromIcao', 'ToIcao', 'UnitType', 'Type'], as_index=False).agg(
-        {'Amount': 'sum', 'Pay': 'sum'})
-    assignments = assignments[['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay']]
-    print('Calculating distance...')
-    assignments['Distance'] = assignments.apply(lambda x: get_distance(x['ToIcao'], x['FromIcao']), axis=1)
-    print('Writing to database...')
+    try:
+        assignments = df.groupby(['FromIcao', 'ToIcao', 'UnitType', 'Type'], as_index=False).agg(
+            {'Amount': 'sum', 'Pay': 'sum'})
+        assignments = assignments[['FromIcao', 'ToIcao', 'Amount', 'UnitType', 'Type', 'Pay']]
+        print('Calculating distance...')
+        assignments['Distance'] = assignments.apply(lambda x: get_distance(x['ToIcao'], x['FromIcao']), axis=1)
+        print('Writing to database...')
+    except KeyError:
+        print('Error: could not retrieve data')
+        return
     try:
         assignments = assignments.loc[:, ~assignments.columns.str.contains('^Unnamed')]
     except KeyError:
@@ -78,20 +90,14 @@ def get_jobs():
 
 def get_aircraft_rentals(aircraft_list):
     table_name = "api_aircraftrental"
-    headers = {}
-    payload = {}
     df = pd.DataFrame()
     for aircraft in aircraft_list:
         url = f'https://server.fseconomy.net/data?userkey={FSE_KEY}' \
               f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft.replace(" ", "%20")}'
         print(f'Gathering aircraft data for {aircraft}...')
+        df = get_data(url, df)
         time.sleep(60)
-        response = requests.request("GET", url, headers=headers, data=payload)
-        if '<Error>' in response.text:
-            print(f'{response.status_code}: {response.text}')
-            pass
-        else:
-            df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
+
     df = df[(df['RentalDry'] > 0) | (df['RentalWet'] > 0)]
     try:
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
@@ -119,7 +125,7 @@ def create_jobs_by_aircraft():
 if __name__ == '__main__':
     create_dbs()
     AVAILABLE_AIRCRAFT = get_aircraft_list()
-    get_jobs()
     get_aircraft_rentals(AVAILABLE_AIRCRAFT)
     create_jobs_by_aircraft()
+    get_jobs()
     con.close()
