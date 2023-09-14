@@ -1,4 +1,4 @@
-# FSEconomyV2
+# FSEconomy-service
 ```url
 http://api.fseconomy-service.com/
 ```
