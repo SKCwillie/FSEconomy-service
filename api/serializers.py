@@ -97,6 +97,7 @@ class JobSerializer(serializers.ModelSerializer):
             'Amount': instance.Amount,
             'UnitType': instance.UnitType,
             'Type': instance.Type,
+            'PayPerUnit': int(round(instance.Pay / instance.Amount, 0)),
             'ReturnPax': instance.ReturnPax
         }
         return representation
@@ -119,6 +120,7 @@ class AircraftJobSerializer(serializers.ModelSerializer):
                 'Amount': int(instance.Amount),
                 'Distance': int(instance.Distance),
                 'UnitType': instance.UnitType,
+                'PayPerUnit': int(round(instance.Pay / instance.Amount, 0)),
                 'ReturnPax': int(instance.ReturnPax),
                 'Pay': int(instance.Pay),
             },
