@@ -5,7 +5,7 @@
       <excludeFolder url="file://$MODULE_DIR$/venv/bin/python" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.11 (fseconomy-service-venv)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.8 (fseconomy-service-venv)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

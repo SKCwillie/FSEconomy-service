@@ -25,7 +25,6 @@ def get_aircraft(request, model_id):
         int(model_id)
     except ValueError:
         model_id = aliases[model_id.lower().replace(' ', '')][1]
-    print(model_id)
     query_set = Aircraft.objects.filter(ModelId=model_id)
     serializer = AircraftSerializer(query_set, many=True)
     return JsonResponse(serializer.data[0], safe=False)
@@ -39,8 +38,6 @@ def airport_list(request):
 
 def get_airport(request, icao):
     query_set = Airport.objects.filter(icao=icao.upper())
-    print(type(query_set))
-    print(query_set)
     serializer = AirportSerializer(query_set, many=True)
     return JsonResponse(serializer.data[0], safe=False)
 
