@@ -4,7 +4,7 @@ from scripts import *
 import pandas as pd
 from dotenv import load_dotenv
 
-load_dotenv('../api/..env')
+load_dotenv('../api/.env')
 FSE_KEY = os.getenv('FSE_KEY')
 
 
