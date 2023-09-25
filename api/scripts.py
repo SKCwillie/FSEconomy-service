@@ -75,7 +75,6 @@ def get_assignments(user_key, icao):
     return json.loads(assignments_json)
 
 
-
 def stringify_icao_list(icao_list, n=30):
     """
     function to take a list and breaks the list into a subset of n strings
@@ -109,11 +108,10 @@ def get_return_pax(FromIcao, ToIcao):
 
 
 def get_max_pax(aircraft):
-    print(aircraft)
     query = f"SELECT Seats FROM api_aircraft WHERE MakeModel = '{aircraft}'"
     try:
         seats = cur.execute(query).fetchone()[0]
-        return int(round((seats - 1) * 0.7, 0))
+        return int(round((seats - 1), 0))
     except TypeError:
         return None
 

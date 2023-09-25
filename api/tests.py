@@ -48,6 +48,16 @@ class TestScripts(unittest.TestCase):
         self.assertEqual(len(icao_list), 1092)
         self.assertEqual(len(stringified_list), 30)
 
+    def test_get_max_pax(self):
+        self.assertEqual(get_max_pax('Beechcraft 18'), 9)
+        self.assertEqual(get_max_pax('Beechcraft King Air 350'), 14)
+        self.assertEqual(get_max_pax('Cessna 208 Caravan'), 13)
+
+    def test_alias_dict(self):
+        self.assertEqual(aliases['beech18'][0], 'Beechcraft 18')
+        self.assertEqual(aliases['ac500swhiteshrike'][0], 'Aero Design AC500C')
+        self.assertEqual(aliases['da62diamonddelightcarbon'][0], 'Diamond DA62')
+
 
 if __name__ == '__main__':
     unittest.main()
