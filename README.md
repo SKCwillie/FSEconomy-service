@@ -262,7 +262,7 @@ GET
 }
 ```
 ## Assignments
-Currently a single endpoint that allows for retrieving assignment information from an airport. This requires passing a userKey as a header and will return assignments grouped by ToIcao. Due to the nature of only being able to support Large airports, this should help alleviate some issues that occur from not supporting small airports. Your user key will be subject to the normal datafeed limits imposed by FSEconomy.
+Currently a single endpoint that allows for retrieving assignment information from an airport. This requires passing a userKey as a header and will return assignments grouped by ToIcao. Due to the nature of  Jobs only being able to support Large airports, this should help alleviate some issues that occur from not supporting small airports. Your user key will be subject to the normal datafeed limits imposed by FSEconomy.
 #### URI
 ```url
 /assignments/(icao)
