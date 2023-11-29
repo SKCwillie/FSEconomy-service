@@ -14,7 +14,7 @@ from api.scripts import get_icao_list, get_distance, stringify_icao_list, get_re
 
 load_dotenv('../api/.env')
 FSE_KEY = os.getenv('FSE_KEY')
-DELAY = 4
+DELAY = 60
 con = sql.connect(db_path, check_same_thread=False)
 cur = con.cursor()
 
