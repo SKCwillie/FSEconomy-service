@@ -14,6 +14,7 @@ from api.scripts import get_icao_list, get_distance, stringify_icao_list, get_re
 
 load_dotenv('../api/.env')
 FSE_KEY = os.getenv('FSE_KEY')
+DELAY = 4
 con = sql.connect(db_path, check_same_thread=False)
 cur = con.cursor()
 
@@ -44,11 +45,14 @@ def get_data(url, df, headers={}, payload={}, error_count=0):
         print('Skipping')
         return df
     elif '<Error>' in response.text and error_count < 10:
+        print(response.text)
         print(f'Trying Again: {errors_allowed - error_count} attempts left before skipping')
         error_count += 1
+        time.sleep(DELAY)
         get_data(url, df, error_count=error_count)
     else:
         df = pd.concat([df, pd.read_csv(StringIO(response.text), sep=',')])
+        time.sleep(DELAY)
     return df
 
 
@@ -63,7 +67,6 @@ def get_jobs():
               f'&format=csv&query=icao&search=jobsfrom&icaos={i}'
         df = get_data(url, df)
         count += 1
-        time.sleep(60)
 
     print('Grouping data...')
     try:
@@ -96,7 +99,7 @@ def get_aircraft_rentals(aircraft_list):
               f'&format=csv&query=aircraft&search=makemodel&makemodel={aircraft.replace(" ", "%20")}'
         print(f'Gathering aircraft data for {aircraft}...')
         df = get_data(url, df)
-        time.sleep(60)
+        time.sleep(DELAY)
 
     df = df[(df['RentalDry'] > 0) | (df['RentalWet'] > 0)]
     try:
@@ -116,10 +119,16 @@ def create_jobs_by_aircraft():
         """
     delete_query = "DROP TABLE api_aircraftjob"
     print('Deleting aircraftjob db')
-    cur.execute(delete_query)
+    try:
+        cur.execute(delete_query)
+    except:
+        print('Could not delete. Skipping')
     print('Creating aircraftjob db')
-    cur.execute(create_query)
-    print('aircraftjob db created')
+    try:
+        cur.execute(create_query)
+        print('aircraftjob db created')
+    except:
+        print("Could not create db. Skipping")
 
 
 if __name__ == '__main__':
